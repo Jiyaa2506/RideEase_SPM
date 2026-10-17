@@ -6,7 +6,8 @@
 
 // Application State
 const state = {
-  activeView: 'rider-view',
+  activeView: 'auth-gateway-view',
+  currentUser: null,
   pickupKey: 'nirma',
   dropKey: 'airport',
   selectedVehicle: 'mini',
@@ -48,6 +49,7 @@ const FLEET_SPOTS = [
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
+  initAuthSession();
   initMap();
   initRiderEvents();
   initDriverEvents();
@@ -57,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================================
-// 1. GLOBAL NAVIGATION & TAB SWITCHING
+// 1. GLOBAL NAVIGATION & ROLE PORTAL AUTHENTICATION
 // ==========================================================
 function initNavigation() {
   const tabs = document.querySelectorAll('.tab-btn');
@@ -67,6 +69,150 @@ function initNavigation() {
       switchView(targetView);
     });
   });
+}
+
+function initAuthSession() {
+  const brandBtn = document.getElementById('brandHomeBtn');
+  if (brandBtn) {
+    brandBtn.addEventListener('click', () => {
+      switchView('auth-gateway-view');
+    });
+  }
+
+  const loginBtn = document.getElementById('navLoginBtn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      switchView('auth-gateway-view');
+    });
+  }
+
+  const logoutBtn = document.getElementById('btnLogout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      logout();
+    });
+  }
+
+  const stored = localStorage.getItem('rideease_user');
+  if (stored) {
+    try {
+      state.currentUser = JSON.parse(stored);
+      applyRoleSession(state.currentUser);
+    } catch (e) {
+      logout();
+    }
+  } else {
+    logout();
+  }
+}
+
+window.handleRoleLogin = async function(role) {
+  let username = "";
+  if (role === 'rider') username = document.getElementById('riderLoginInput').value;
+  if (role === 'driver') username = document.getElementById('driverLoginInput').value;
+  if (role === 'admin') username = document.getElementById('adminLoginInput').value;
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, username })
+    });
+    const data = await res.json();
+    if (data.success) {
+      state.currentUser = data.user;
+      state.currentUser.role = role;
+      localStorage.setItem('rideease_user', JSON.stringify(state.currentUser));
+      applyRoleSession(state.currentUser);
+      showToast(`Signed in successfully as ${state.currentUser.name}!`, 'success');
+    }
+  } catch (err) {
+    quickDemoLogin(role);
+  }
+};
+
+window.quickDemoLogin = function(role) {
+  let user = null;
+  if (role === 'rider') {
+    user = {
+      role: 'rider',
+      id: 'RDR-115',
+      name: 'Jayni Khimasia',
+      phone: '+91 98980-12345',
+      email: 'jayni.khimasia@nirmauni.ac.in'
+    };
+  } else if (role === 'driver') {
+    user = {
+      role: 'driver',
+      id: 'DRV-101',
+      name: 'Captain Rajesh Kumar',
+      phone: '+91 98765-43210',
+      vehicleModel: 'White Swift Dzire',
+      plateNumber: 'GJ-01-AB-4829'
+    };
+  } else if (role === 'admin') {
+    user = {
+      role: 'admin',
+      id: 'ADM-2026',
+      name: 'System Admin (Jiya Patel)',
+      email: 'admin@rideease.nirmauni.ac.in'
+    };
+  } else if (role === 'split') {
+    user = {
+      role: 'admin',
+      id: 'DEMO-PAIR',
+      name: 'Jayni & Jiya (Dual Demo)'
+    };
+  }
+
+  state.currentUser = user;
+  localStorage.setItem('rideease_user', JSON.stringify(user));
+  applyRoleSession(user);
+  if (role === 'split') switchView('split-view');
+  showToast(`Logged into ${role.toUpperCase()} portal!`, 'success');
+};
+
+window.logout = function() {
+  state.currentUser = null;
+  localStorage.removeItem('rideease_user');
+  document.getElementById('mainNavTabs').style.display = 'none';
+  document.getElementById('navUserProfile').style.display = 'none';
+  document.getElementById('navLoginBtn').style.display = 'inline-flex';
+  switchView('auth-gateway-view');
+  showToast('Signed out of RideEase portal', 'info');
+};
+
+function applyRoleSession(user) {
+  const navTabs = document.getElementById('mainNavTabs');
+  const profileBox = document.getElementById('navUserProfile');
+  const loginBtn = document.getElementById('navLoginBtn');
+  const userNameSpan = document.getElementById('userSessionName');
+
+  navTabs.style.display = 'flex';
+  profileBox.style.display = 'flex';
+  loginBtn.style.display = 'none';
+
+  // Reset tab visibility
+  document.getElementById('navTabRider').style.display = 'none';
+  document.getElementById('navTabDriver').style.display = 'none';
+  document.getElementById('navTabAdmin').style.display = 'none';
+  document.getElementById('navTabScm').style.display = 'none';
+  document.getElementById('navTabSplit').style.display = 'inline-flex';
+
+  if (user.role === 'rider') {
+    userNameSpan.innerHTML = `<i class="fa-solid fa-user"></i> ${user.name} (Rider)`;
+    document.getElementById('navTabRider').style.display = 'inline-flex';
+    switchView('rider-view');
+  } else if (user.role === 'driver') {
+    userNameSpan.innerHTML = `<i class="fa-solid fa-taxi"></i> ${user.name} (${user.plateNumber || 'Captain'})`;
+    document.getElementById('navTabDriver').style.display = 'inline-flex';
+    switchView('driver-view');
+  } else if (user.role === 'admin') {
+    userNameSpan.innerHTML = `<i class="fa-solid fa-shield-halved"></i> ${user.name}`;
+    document.getElementById('navTabAdmin').style.display = 'inline-flex';
+    document.getElementById('navTabScm').style.display = 'inline-flex';
+    switchView('admin-view');
+  }
 }
 
 function switchView(viewId) {
@@ -135,35 +281,39 @@ function setupSplitView() {
 }
 
 // ==========================================================
-// 2. LEAFLET INTERACTIVE MAP SYSTEM
+// 2. LEAFLET INTERACTIVE MAP SYSTEM (100% Free Esri Maps, No 403 Blocks)
 // ==========================================================
 function initMap() {
-  const nirmaPos = [LOCATIONS.nirma.lat, LOCATIONS.nirma.lng];
-  
   state.activeMap = L.map('rideMap', {
     center: [23.0900, 72.5600],
     zoom: 12,
     zoomControl: true
   });
 
-  // 100% Free Tile Servers (No API keys or credit cards required)
-  const osmStandard = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19
-  });
-
+  // 100% Free Esri Street Tile Server (Never blocks localhost, No API keys required)
   const esriStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+    attribution: 'Tiles &copy; Esri &mdash; Street Map',
     maxZoom: 19
   });
 
-  // Default to OSM
-  osmStandard.addTo(state.activeMap);
+  const esriDark = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Dark Navigation',
+    maxZoom: 16
+  });
+
+  const esriTopo = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Topo Map',
+    maxZoom: 19
+  });
+
+  // Default to Esri Street (No 403 block)
+  esriStreet.addTo(state.activeMap);
 
   // Add Layer Control for easy map style toggling
   L.control.layers({
-    "OpenStreetMap (Standard)": osmStandard,
-    "Navigation Street View (Esri)": esriStreet
+    "Navigation Street Map (Esri)": esriStreet,
+    "Dark Navigation Canvas (Esri)": esriDark,
+    "Topographic View (Esri)": esriTopo
   }, null, { position: 'topleft' }).addTo(state.activeMap);
 
   // Render static fleet cars

@@ -178,6 +178,63 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 // API ROUTES
 // ==========================================
 
+// 0. User Authentication & Role Selection (FR-1, FR-2, FR-13)
+app.post('/api/auth/login', (req, res) => {
+  const { role, username, password, driverId } = req.body;
+
+  if (role === 'rider') {
+    return res.json({
+      success: true,
+      role: 'rider',
+      user: {
+        id: 'RDR-115',
+        name: username || 'Jayni Khimasia',
+        phone: '+91 98980-12345',
+        email: 'jayni.khimasia@nirmauni.ac.in',
+        walletBalance: 850,
+        rating: 4.95,
+        savedAddress: 'Nirma University, SG Highway'
+      }
+    });
+  }
+
+  if (role === 'driver') {
+    const matchedDriver = drivers.find(d => d.id === (driverId || 'DRV-101')) || drivers[0];
+    return res.json({
+      success: true,
+      role: 'driver',
+      user: {
+        id: matchedDriver.id,
+        name: matchedDriver.name,
+        phone: matchedDriver.phone,
+        vehicleModel: matchedDriver.vehicleModel,
+        plateNumber: matchedDriver.plateNumber,
+        vehicleType: matchedDriver.vehicleType,
+        rating: matchedDriver.rating,
+        trips: matchedDriver.trips,
+        earningsToday: matchedDriver.earningsToday,
+        status: matchedDriver.status
+      }
+    });
+  }
+
+  if (role === 'admin') {
+    return res.json({
+      success: true,
+      role: 'admin',
+      user: {
+        id: 'ADM-2026',
+        name: 'System Administrator (Jiya Patel)',
+        email: 'admin@rideease.nirmauni.ac.in',
+        department: 'Dept of CSE, Nirma University',
+        accessLevel: 'Super Administrator & SCM Controller'
+      }
+    });
+  }
+
+  res.status(400).json({ error: 'Invalid role or credentials' });
+});
+
 // 1. System Health & SPM NFR-3 Availability
 app.get('/api/health', (req, res) => {
   res.json({

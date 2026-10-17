@@ -20,7 +20,7 @@
   <!-- TOP GLOBAL NAVIGATION BAR -->
   <header class="top-nav">
     <div class="nav-container">
-      <div class="brand">
+      <div class="brand" id="brandHomeBtn" style="cursor:pointer;" title="Return to Role Gateway">
         <div class="brand-logo">
           <i class="fa-solid fa-car-side"></i>
         </div>
@@ -30,33 +30,45 @@
         </div>
       </div>
 
-      <!-- Center View Switcher Tabs -->
-      <nav class="view-tabs">
-        <button class="tab-btn active" data-view="rider-view">
+      <!-- Center View Switcher Tabs (dynamically filtered by role) -->
+      <nav class="view-tabs" id="mainNavTabs" style="display:none;">
+        <button class="tab-btn" data-view="rider-view" id="navTabRider">
           <i class="fa-solid fa-mobile-screen"></i> <span>Rider App</span>
         </button>
-        <button class="tab-btn" data-view="driver-view">
+        <button class="tab-btn" data-view="driver-view" id="navTabDriver">
           <i class="fa-solid fa-taxi"></i> <span>Driver Companion</span>
         </button>
-        <button class="tab-btn" data-view="admin-view">
+        <button class="tab-btn" data-view="admin-view" id="navTabAdmin">
           <i class="fa-solid fa-chart-line"></i> <span>Admin Operations</span>
         </button>
-        <button class="tab-btn" data-view="scm-view">
-          <i class="fa-solid fa-code-branch"></i> <span>Git & SCM Explorer</span>
+        <button class="tab-btn" data-view="scm-view" id="navTabScm">
+          <i class="fa-solid fa-code-branch"></i> <span>Git & SCM</span>
         </button>
-        <button class="tab-btn highlight" data-view="split-view">
+        <button class="tab-btn highlight" data-view="split-view" id="navTabSplit">
           <i class="fa-solid fa-columns"></i> <span>Split Simulation</span>
         </button>
       </nav>
 
-      <!-- Right SPM & System Badges -->
+      <!-- Right SPM & User Session Controls -->
       <div class="nav-badges">
         <div class="badge badge-health" id="healthBadge" title="NFR-3 Availability: 99.5% Conformance">
-          <span class="status-dot"></span> Uptime: 99.5%
+          <span class="status-dot"></span> 99.5% Uptime
         </div>
-        <div class="badge badge-git" title="SCM Baseline Version">
-          <i class="fa-solid fa-tag"></i> v1.0.1 (Release)
+        
+        <!-- Active User Profile Pill -->
+        <div id="navUserProfile" style="display:none; align-items:center; gap:0.5rem;">
+          <div class="user-session-pill" id="userSessionBadge">
+            <i class="fa-solid fa-user-circle"></i> <span id="userSessionName">Jayni (Rider)</span>
+          </div>
+          <button id="btnLogout" class="btn btn-outline btn-sm" title="Log out or switch to another dashboard">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
         </div>
+
+        <!-- Login Prompt if logged out -->
+        <button id="navLoginBtn" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Switch Portal / Sign In
+        </button>
       </div>
     </div>
   </header>
@@ -65,9 +77,123 @@
   <main class="main-content">
 
     <!-- ============================================== -->
+    <!-- VIEW 0: AUTHENTICATION & ROLE SELECTION GATEWAY -->
+    <!-- ============================================== -->
+    <section id="auth-gateway-view" class="view-section active">
+      <div class="auth-gateway-container">
+        
+        <div class="auth-hero">
+          <div class="auth-hero-badge"><i class="fa-solid fa-shield-cat"></i> SPM Tutorial 14 Prototype</div>
+          <h1>Welcome to <span>RideEase</span></h1>
+          <p class="auth-hero-sub">
+            On-Demand Ride-Hailing Mobile Platform (Uber / Ola Reference Architecture).<br>
+            Please select your portal to continue with dedicated role-based dashboards:
+          </p>
+        </div>
+
+        <div class="portal-cards-grid">
+          
+          <!-- PORTAL 1: RIDER APP -->
+          <div class="portal-card">
+            <div class="portal-card-header">
+              <div class="portal-icon rider-color"><i class="fa-solid fa-mobile-screen"></i></div>
+              <div class="portal-tag">PASSENGER APP</div>
+            </div>
+            <h3>Rider Portal</h3>
+            <p class="portal-desc">
+              Book doorstep rides, get fare estimates with dynamic surge, track live drivers, and pay cashlessly.
+            </p>
+            <div class="portal-form">
+              <div class="form-group-auth">
+                <label>Mobile Number or Email</label>
+                <input type="text" id="riderLoginInput" class="form-input" value="+91 98980-12345" />
+              </div>
+              <div class="form-group-auth">
+                <label>Account Password / OTP</label>
+                <input type="password" id="riderOtpInput" class="form-input" value="1234" />
+              </div>
+              <button class="btn btn-primary btn-block" onclick="handleRoleLogin('rider')">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Rider App
+              </button>
+              <button class="btn btn-outline btn-block btn-sm mt-2" onclick="quickDemoLogin('rider')">
+                ⚡ Quick Demo: Jayni Khimasia (23BCE115)
+              </button>
+            </div>
+          </div>
+
+          <!-- PORTAL 2: DRIVER COMPANION -->
+          <div class="portal-card">
+            <div class="portal-card-header">
+              <div class="portal-icon driver-color"><i class="fa-solid fa-taxi"></i></div>
+              <div class="portal-tag">PARTNER CAPTAIN</div>
+            </div>
+            <h3>Driver Portal</h3>
+            <p class="portal-desc">
+              Accept incoming ride dispatches, follow turn-by-turn navigation, verify passenger PINs, and track earnings.
+            </p>
+            <div class="portal-form">
+              <div class="form-group-auth">
+                <label>Driver ID or Phone</label>
+                <input type="text" id="driverLoginInput" class="form-input" value="DRV-101" />
+              </div>
+              <div class="form-group-auth">
+                <label>Vehicle Plate Registration</label>
+                <input type="text" id="driverPlateInput" class="form-input" value="GJ-01-AB-4829" />
+              </div>
+              <button class="btn btn-success btn-block" onclick="handleRoleLogin('driver')">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Driver Companion
+              </button>
+              <button class="btn btn-outline btn-block btn-sm mt-2" onclick="quickDemoLogin('driver')">
+                ⚡ Quick Demo: Captain Rajesh Kumar
+              </button>
+            </div>
+          </div>
+
+          <!-- PORTAL 3: ADMIN OPERATIONS & SPM -->
+          <div class="portal-card">
+            <div class="portal-card-header">
+              <div class="portal-icon admin-color"><i class="fa-solid fa-chart-line"></i></div>
+              <div class="portal-tag">SYSTEM OPERATOR</div>
+            </div>
+            <h3>Admin Portal</h3>
+            <p class="portal-desc">
+              Manage driver documents, broadcast dynamic surge pricing, monitor SPM EVM metrics, and explore Git SCM.
+            </p>
+            <div class="portal-form">
+              <div class="form-group-auth">
+                <label>Administrator Email</label>
+                <input type="text" id="adminLoginInput" class="form-input" value="admin@rideease.nirmauni.ac.in" />
+              </div>
+              <div class="form-group-auth">
+                <label>Security Password</label>
+                <input type="password" id="adminPasswordInput" class="form-input" value="admin123" />
+              </div>
+              <button class="btn btn-primary btn-block" onclick="handleRoleLogin('admin')">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Admin Console
+              </button>
+              <button class="btn btn-outline btn-block btn-sm mt-2" onclick="quickDemoLogin('admin')">
+                ⚡ Quick Demo: System Admin (Jiya Patel)
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Demonstration Mode Shortcut -->
+        <div class="demo-mode-footer">
+          <span>🎓 Instructor Evaluation & Viva Presentation:</span>
+          <button class="btn btn-outline btn-sm" onclick="quickDemoLogin('split')">
+            <i class="fa-solid fa-columns"></i> Open Dual Split-Screen Simulation (Rider & Driver Side-by-Side)
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
     <!-- VIEW 1: RIDER APPLICATION (UBER/OLA STYLE) -->
     <!-- ============================================== -->
-    <section id="rider-view" class="view-section active">
+    <section id="rider-view" class="view-section">
       <div class="app-layout">
         
         <!-- Left Ride Booking Sidebar / Card -->
