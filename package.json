@@ -1,0 +1,24 @@
+{
+  "name": "rideease-prototype",
+  "version": "1.0.1",
+  "description": "RideEase — An On-Demand Ride-Hailing Mobile Application (Uber/Ola Reference Prototype) for Software Project Management Tutorial 14",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/run-tests.js"
+  },
+  "keywords": [
+    "ride-hailing",
+    "uber-clone",
+    "software-project-management",
+    "spm-tutorial-14",
+    "scm",
+    "configuration-management"
+  ],
+  "author": "Jayni Khimasia (23BCE115) & Jiya Patel (23BCE123)",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  }
+}
