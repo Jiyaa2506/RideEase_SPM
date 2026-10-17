@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RideEase — On-Demand Ride-Hailing Platform</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans antialiased">
+
+  <!-- TOP GLOBAL NAVIGATION BAR -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-car-side"></i>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">Ride<span>Ease</span></div>
+          <div class="brand-tagline">On-Demand Mobility Platform</div>
+        </div>
+      </div>
+
+      <!-- Center View Switcher Tabs -->
+      <nav class="view-tabs">
+        <button class="tab-btn active" data-view="rider-view">
+          <i class="fa-solid fa-mobile-screen"></i> <span>Rider App</span>
+        </button>
+        <button class="tab-btn" data-view="driver-view">
+          <i class="fa-solid fa-taxi"></i> <span>Driver Companion</span>
+        </button>
+        <button class="tab-btn" data-view="admin-view">
+          <i class="fa-solid fa-chart-line"></i> <span>Admin Operations</span>
+        </button>
+        <button class="tab-btn" data-view="scm-view">
+          <i class="fa-solid fa-code-branch"></i> <span>Git & SCM Explorer</span>
+        </button>
+        <button class="tab-btn highlight" data-view="split-view">
+          <i class="fa-solid fa-columns"></i> <span>Split Simulation</span>
+        </button>
+      </nav>
+
+      <!-- Right SPM & System Badges -->
+      <div class="nav-badges">
+        <div class="badge badge-health" id="healthBadge" title="NFR-3 Availability: 99.5% Conformance">
+          <span class="status-dot"></span> Uptime: 99.5%
+        </div>
+        <div class="badge badge-git" title="SCM Baseline Version">
+          <i class="fa-solid fa-tag"></i> v1.0.1 (Release)
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER WITH DYNAMIC VIEWS -->
+  <main class="main-content">
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: RIDER APPLICATION (UBER/OLA STYLE) -->
+    <!-- ============================================== -->
+    <section id="rider-view" class="view-section active">
+      <div class="app-layout">
+        
+        <!-- Left Ride Booking Sidebar / Card -->
+        <aside class="sidebar-panel">
+          <div class="panel-header">
+            <h2>Where to, <span id="riderGreeting">Jayni</span>? 👋</h2>
+            <p class="subtitle">Book safe, reliable doorstep rides across town</p>
+          </div>
+
+          <!-- Booking Step 1: Location & Fare Form -->
+          <div id="bookingStepLocations" class="booking-step active">
+            <!-- Location Selection Box -->
+            <div class="location-box">
+              <div class="location-line">
+                <span class="dot-green"></span>
+                <span class="line-connector"></span>
+                <span class="square-black"></span>
+              </div>
+              <div class="location-inputs">
+                <div class="input-group">
+                  <label>Pickup Location</label>
+                  <select id="pickupSelect" class="form-select">
+                    <option value="nirma" selected>🏫 Nirma University, SG Highway</option>
+                    <option value="vaishnodevi">⭕ Vaishno Devi Circle</option>
+                    <option value="sindhubhavan">🏢 Sindhu Bhavan Road (SBR)</option>
+                    <option value="iskcon">🛍️ ISKCON Crossroads</option>
+                    <option value="airport">✈️ Sardar Vallabhbhai Patel Airport</option>
+                    <option value="kalupur">🚆 Kalupur Railway Station</option>
+                    <option value="giftcity">🏙️ GIFT City Club, Gandhinagar</option>
+                    <option value="prahladnagar">🌳 Prahlad Nagar Garden</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label>Destination Drop</label>
+                  <select id="dropSelect" class="form-select">
+                    <option value="airport" selected>✈️ Sardar Vallabhbhai Patel Airport</option>
+                    <option value="nirma">🏫 Nirma University, SG Highway</option>
+                    <option value="vaishnodevi">⭕ Vaishno Devi Circle</option>
+                    <option value="sindhubhavan">🏢 Sindhu Bhavan Road (SBR)</option>
+                    <option value="iskcon">🛍️ ISKCON Crossroads</option>
+                    <option value="kalupur">🚆 Kalupur Railway Station</option>
+                    <option value="giftcity">🏙️ GIFT City Club, Gandhinagar</option>
+                    <option value="prahladnagar">🌳 Prahlad Nagar Garden</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Trip Stats Bar -->
+            <div class="trip-stats-bar">
+              <div class="stat-pill"><i class="fa-solid fa-route"></i> <span id="tripDist">16.4 km</span></div>
+              <div class="stat-pill"><i class="fa-regular fa-clock"></i> <span id="tripEta">28 mins</span></div>
+              <div class="stat-pill surge" id="surgeBadge" title="Dynamic Surge Pricing active per FR-5">
+                <i class="fa-solid fa-bolt"></i> <span id="surgeText">1.2x Peak Surge</span>
+              </div>
+            </div>
+
+            <!-- Vehicle Options List (Uber Style) -->
+            <div class="vehicle-options-section">
+              <h3>Available Ride Categories</h3>
+              <div class="vehicle-list" id="vehicleList">
+                
+                <!-- Auto -->
+                <div class="vehicle-card" data-type="auto">
+                  <div class="vehicle-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3202/3202926.png" alt="Auto" />
+                  </div>
+                  <div class="vehicle-details">
+                    <div class="vehicle-title">RideEase Auto <span class="cap-pill"><i class="fa-solid fa-user"></i> 3</span></div>
+                    <div class="vehicle-desc">Doorstep auto ride, no bargaining</div>
+                    <div class="vehicle-time"><i class="fa-solid fa-clock"></i> 3 min away</div>
+                  </div>
+                  <div class="vehicle-price" id="fare-auto">₹195</div>
+                </div>
+
+                <!-- Mini / Go (Default Selected) -->
+                <div class="vehicle-card selected" data-type="mini">
+                  <div class="badge-pop">POPULAR</div>
+                  <div class="vehicle-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3202/3202941.png" alt="Mini" />
+                  </div>
+                  <div class="vehicle-details">
+                    <div class="vehicle-title">RideEase Mini <span class="cap-pill"><i class="fa-solid fa-user"></i> 4</span></div>
+                    <div class="vehicle-desc">Comfortable hatchbacks with AC</div>
+                    <div class="vehicle-time"><i class="fa-solid fa-clock"></i> 2 min away</div>
+                  </div>
+                  <div class="vehicle-price" id="fare-mini">₹290</div>
+                </div>
+
+                <!-- Sedan -->
+                <div class="vehicle-card" data-type="sedan">
+                  <div class="vehicle-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3202/3202929.png" alt="Sedan" />
+                  </div>
+                  <div class="vehicle-details">
+                    <div class="vehicle-title">RideEase Sedan <span class="cap-pill"><i class="fa-solid fa-user"></i> 4</span></div>
+                    <div class="vehicle-desc">Spacious sedans with top rated captains</div>
+                    <div class="vehicle-time"><i class="fa-solid fa-clock"></i> 4 min away</div>
+                  </div>
+                  <div class="vehicle-price" id="fare-sedan">₹385</div>
+                </div>
+
+                <!-- Premier / XL -->
+                <div class="vehicle-card" data-type="premier">
+                  <div class="vehicle-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3202/3202937.png" alt="Premier" />
+                  </div>
+                  <div class="vehicle-details">
+                    <div class="vehicle-title">RideEase Premier <span class="cap-pill"><i class="fa-solid fa-user"></i> 6</span></div>
+                    <div class="vehicle-desc">Premium SUVs for group travel</div>
+                    <div class="vehicle-time"><i class="fa-solid fa-clock"></i> 5 min away</div>
+                  </div>
+                  <div class="vehicle-price" id="fare-premier">₹540</div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Payment & Promo Selector -->
+            <div class="payment-selector-bar">
+              <div class="payment-method">
+                <i class="fa-solid fa-credit-card"></i>
+                <select id="paymentMethodSelect" class="clean-select">
+                  <option value="UPI (Google Pay / PhonePe)">UPI (GPay / PhonePe)</option>
+                  <option value="RideEase Wallet">RideEase Wallet (₹850)</option>
+                  <option value="Credit / Debit Card">Credit/Debit Card (**** 4021)</option>
+                  <option value="Cash on Delivery">Cash to Driver</option>
+                </select>
+              </div>
+              <div class="promo-box">
+                <span class="promo-badge"><i class="fa-solid fa-tag"></i> NIRMA50 Applied</span>
+              </div>
+            </div>
+
+            <!-- Booking CTA Button -->
+            <button id="btnRequestRide" class="btn btn-primary btn-block">
+              <span class="btn-text">Book RideEase Mini</span>
+              <span class="btn-price" id="btnSelectedFare">₹290</span>
+            </button>
+          </div>
+
+          <!-- Booking Step 2: Driver Matching Radar (NFR-1 < 10s) -->
+          <div id="bookingStepMatching" class="booking-step">
+            <div class="matching-container">
+              <div class="radar-box">
+                <div class="radar-wave"></div>
+                <div class="radar-wave wave-2"></div>
+                <div class="radar-icon"><i class="fa-solid fa-car-side"></i></div>
+              </div>
+              <h3>Matching Nearest Available Captain...</h3>
+              <p class="subtitle">Looking for top-rated drivers around SG Highway & Nirma Univ</p>
+              <div class="matching-progress-bar">
+                <div class="progress-fill" id="matchingProgress"></div>
+              </div>
+              <p class="nfr-note"><i class="fa-solid fa-stopwatch"></i> NFR-1 SLA: Matching completes in &lt; 3.0s</p>
+              <button id="btnCancelMatching" class="btn btn-outline btn-sm">Cancel Request</button>
+            </div>
+          </div>
+
+          <!-- Booking Step 3: Active Ride & Live Tracking -->
+          <div id="bookingStepActiveRide" class="booking-step">
+            <div class="active-ride-card">
+              
+              <!-- Driver Header Info -->
+              <div class="driver-profile-header">
+                <div class="driver-avatar">
+                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" alt="Driver" />
+                  <span class="driver-rating-badge"><i class="fa-solid fa-star"></i> <span id="activeDriverRating">4.88</span></span>
+                </div>
+                <div class="driver-meta">
+                  <div class="driver-name" id="activeDriverName">Rajesh Kumar</div>
+                  <div class="driver-car" id="activeDriverVehicle">White Maruti Swift Dzire</div>
+                  <div class="plate-number" id="activeDriverPlate">GJ-01-AB-4829</div>
+                </div>
+                <!-- 4-Digit Security PIN / OTP -->
+                <div class="otp-pill">
+                  <span class="otp-label">START PIN</span>
+                  <span class="otp-code" id="activeRideOtp">4829</span>
+                </div>
+              </div>
+
+              <!-- Status & ETA Banner -->
+              <div class="trip-status-banner" id="tripStatusBanner">
+                <div class="status-indicator-dot pulse"></div>
+                <div class="status-message-box">
+                  <div class="status-title" id="rideStatusText">Captain is on the way</div>
+                  <div class="status-sub" id="rideStatusSub">Arriving at Nirma University in 3 mins</div>
+                </div>
+              </div>
+
+              <!-- Safety SOS & Quick Actions -->
+              <div class="safety-actions-grid">
+                <button id="btnSosTrigger" class="btn btn-danger btn-sm" title="FR-12 Safety & SOS Button">
+                  <i class="fa-solid fa-triangle-exclamation"></i> SOS Emergency
+                </button>
+                <button id="btnShareRide" class="btn btn-outline btn-sm" title="Share live ride link with family">
+                  <i class="fa-solid fa-share-nodes"></i> Share Trip
+                </button>
+                <button id="btnCancelActiveRide" class="btn btn-outline btn-sm">
+                  <i class="fa-solid fa-xmark"></i> Cancel
+                </button>
+              </div>
+
+              <!-- Trip Route Info -->
+              <div class="trip-route-details">
+                <div class="route-point">
+                  <i class="fa-solid fa-circle-dot green"></i>
+                  <div>
+                    <div class="point-label">PICKUP</div>
+                    <div class="point-address" id="activePickupName">Nirma University, SG Highway</div>
+                  </div>
+                </div>
+                <div class="route-point">
+                  <i class="fa-solid fa-location-dot red"></i>
+                  <div>
+                    <div class="point-label">DESTINATION</div>
+                    <div class="point-address" id="activeDropName">Sardar Vallabhbhai Patel Airport</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fare & Payment Summary -->
+              <div class="active-fare-summary">
+                <span class="fare-label">Estimated Total Fare:</span>
+                <span class="fare-amount" id="activeTotalFare">₹290</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Booking Step 4: Digital Receipt & Rating (FR-8, FR-9) -->
+          <div id="bookingStepReceipt" class="booking-step">
+            <div class="receipt-card">
+              <div class="receipt-icon"><i class="fa-solid fa-circle-check"></i></div>
+              <h3>You Have Arrived!</h3>
+              <p class="subtitle">Thank you for riding with RideEase</p>
+
+              <div class="receipt-breakdown">
+                <div class="receipt-row">
+                  <span>Trip ID</span>
+                  <strong id="receiptRideId">RIDE-9903</strong>
+                </div>
+                <div class="receipt-row">
+                  <span>Distance & Duration</span>
+                  <span id="receiptMetrics">16.4 km (28 mins)</span>
+                </div>
+                <div class="receipt-row">
+                  <span>Base & Distance Fare</span>
+                  <span id="receiptBaseFare">₹260</span>
+                </div>
+                <div class="receipt-row">
+                  <span>Peak Demand Surge (1.2x)</span>
+                  <span id="receiptSurge">₹30</span>
+                </div>
+                <div class="receipt-row total">
+                  <span>Total Amount Paid</span>
+                  <strong id="receiptTotal">₹290</strong>
+                </div>
+                <div class="receipt-row payment">
+                  <span>Payment Method</span>
+                  <span id="receiptPayment">UPI (Google Pay)</span>
+                </div>
+              </div>
+
+              <!-- Two-way Rating Stars -->
+              <div class="rating-box">
+                <h4>Rate your experience with <span id="ratingDriverName">Rajesh</span></h4>
+                <div class="star-rating" id="starRating">
+                  <i class="fa-solid fa-star selected" data-star="1"></i>
+                  <i class="fa-solid fa-star selected" data-star="2"></i>
+                  <i class="fa-solid fa-star selected" data-star="3"></i>
+                  <i class="fa-solid fa-star selected" data-star="4"></i>
+                  <i class="fa-solid fa-star selected" data-star="5"></i>
+                </div>
+                <input type="text" id="ratingComment" class="form-input" placeholder="Leave a compliment or feedback (optional)..." />
+                <button id="btnSubmitRating" class="btn btn-primary btn-block">Submit Rating & Done</button>
+              </div>
+
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- Right Interactive Map Canvas (Leaflet.js) -->
+        <div class="map-container">
+          <div id="rideMap" class="leaflet-map-canvas"></div>
+          
+          <!-- Map Overlay Badges -->
+          <div class="map-overlay-card">
+            <div class="overlay-item">
+              <span class="indicator-green"></span>
+              <span><strong>5 Active Cabs</strong> nearby</span>
+            </div>
+            <div class="overlay-item">
+              <i class="fa-solid fa-bolt text-yellow-400"></i>
+              <span>Live Dynamic Surge: <strong><span id="mapSurgeFactor">1.2</span>x</strong></span>
+            </div>
+            <button id="btnRecenterMap" class="btn-icon" title="Recenter Map"><i class="fa-solid fa-crosshairs"></i></button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: DRIVER COMPANION APP -->
+    <!-- ============================================== -->
+    <section id="driver-view" class="view-section">
+      <div class="driver-layout">
+        <div class="driver-phone-shell">
+          
+          <!-- Driver Phone Screen -->
+          <div class="driver-app-content">
+            <!-- Driver Top Bar -->
+            <div class="driver-topbar">
+              <div class="driver-info-badge">
+                <span class="driver-avatar-mini">RK</span>
+                <div>
+                  <div class="driver-name-title">Captain Rajesh Kumar</div>
+                  <div class="driver-plate-title">GJ-01-AB-4829 (Swift Dzire)</div>
+                </div>
+              </div>
+              <div class="driver-toggle-box">
+                <label class="switch">
+                  <input type="checkbox" id="driverOnlineToggle" checked>
+                  <span class="slider round"></span>
+                </label>
+                <span class="status-label" id="driverStatusLabel">ONLINE</span>
+              </div>
+            </div>
+
+            <!-- Driver Earnings Today Widget -->
+            <div class="earnings-banner">
+              <div class="earning-item">
+                <span class="label">Today's Earnings</span>
+                <span class="value" id="driverTodayEarnings">₹2,140</span>
+              </div>
+              <div class="earning-divider"></div>
+              <div class="earning-item">
+                <span class="label">Completed Trips</span>
+                <span class="value" id="driverTodayTrips">8</span>
+              </div>
+              <div class="earning-divider"></div>
+              <div class="earning-item">
+                <span class="label">Acceptance Rate</span>
+                <span class="value">96%</span>
+              </div>
+            </div>
+
+            <!-- Driver Navigation & Active Order Canvas -->
+            <div class="driver-action-area">
+              
+              <!-- State A: Waiting for Request -->
+              <div id="driverStateWaiting" class="driver-screen-state active">
+                <div class="waiting-illustration">
+                  <div class="radar-ping"></div>
+                  <i class="fa-solid fa-location-arrow"></i>
+                </div>
+                <h3>You are Online & Ready</h3>
+                <p>Cruising around Vaishno Devi Circle / Nirma University for incoming ride requests...</p>
+                <div class="sim-notice">
+                  <i class="fa-solid fa-info-circle"></i> Go to <strong>Rider App</strong> tab and book a ride to trigger an incoming trip notification!
+                </div>
+              </div>
+
+              <!-- State B: Incoming Ride Request Notification Sheet -->
+              <div id="driverStateIncoming" class="driver-screen-state">
+                <div class="incoming-alert-card">
+                  <div class="incoming-header">
+                    <span class="badge-incoming"><i class="fa-solid fa-bell"></i> NEW RIDE REQUEST</span>
+                    <span class="timer-countdown" id="driverCountdown">15s</span>
+                  </div>
+                  <div class="incoming-price" id="incomingFare">₹290</div>
+                  <div class="incoming-category">RideEase Mini • Cashless UPI</div>
+
+                  <div class="incoming-route">
+                    <div class="incoming-point">
+                      <span class="dot-green"></span>
+                      <div>
+                        <strong>Pickup:</strong>
+                        <div id="incomingPickup">Nirma University, SG Highway</div>
+                      </div>
+                    </div>
+                    <div class="incoming-point">
+                      <span class="square-black"></span>
+                      <div>
+                        <strong>Drop:</strong>
+                        <div id="incomingDrop">Ahmedabad Airport (AMD)</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="incoming-actions">
+                    <button id="btnDriverDecline" class="btn btn-outline btn-block">Decline</button>
+                    <button id="btnDriverAccept" class="btn btn-success btn-block pulse">ACCEPT RIDE</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- State C: In-Transit Turn-By-Turn Controls -->
+              <div id="driverStateTransit" class="driver-screen-state">
+                <div class="transit-card">
+                  <div class="transit-header">
+                    <div class="passenger-meta">
+                      <div class="passenger-name" id="driverPassengerName">Jayni Khimasia</div>
+                      <div class="passenger-phone"><i class="fa-solid fa-phone"></i> +91 98980-12345</div>
+                    </div>
+                    <div class="fare-tag" id="driverTransitFare">₹290</div>
+                  </div>
+
+                  <!-- Navigation Step Callout -->
+                  <div class="nav-instruction-box">
+                    <div class="nav-turn-icon"><i class="fa-solid fa-arrow-turn-up"></i></div>
+                    <div class="nav-text">
+                      <div class="nav-dist" id="driverNavDist">In 400m</div>
+                      <div class="nav-street" id="driverNavStreet">Turn right onto SG Highway towards Airport</div>
+                    </div>
+                  </div>
+
+                  <!-- Driver Action Button according to Ride Lifecycle -->
+                  <div class="driver-trip-lifecycle">
+                    
+                    <!-- Sub-action 1: Mark Arrived -->
+                    <div id="driverActionArrivedBox">
+                      <button id="btnDriverMarkArrived" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-location-dot"></i> I Have Arrived at Pickup
+                      </button>
+                    </div>
+
+                    <!-- Sub-action 2: Verify OTP & Start -->
+                    <div id="driverActionStartBox" style="display:none;">
+                      <div class="otp-input-group">
+                        <label>Enter Rider's 4-Digit PIN</label>
+                        <input type="text" id="driverOtpInput" maxlength="4" placeholder="Enter PIN" class="form-input text-center" />
+                        <button id="btnDriverStartTrip" class="btn btn-success btn-block">
+                          <i class="fa-solid fa-play"></i> Verify PIN & Start Trip
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Sub-action 3: Complete Trip -->
+                    <div id="driverActionCompleteBox" style="display:none;">
+                      <button id="btnDriverCompleteTrip" class="btn btn-warning btn-block">
+                        <i class="fa-solid fa-flag-checkered"></i> Complete Trip & Collect ₹<span id="driverCollectAmount">290</span>
+                      </button>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 3: ADMIN DASHBOARD (FR-13 & SPM METRICS) -->
+    <!-- ============================================== -->
+    <section id="admin-view" class="view-section">
+      <div class="admin-dashboard-container">
+        
+        <!-- Top Metrics Cards -->
+        <div class="admin-kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon blue"><i class="fa-solid fa-car"></i></div>
+            <div class="kpi-info">
+              <div class="kpi-label">Active Rides</div>
+              <div class="kpi-value" id="adminActiveCount">1</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon green"><i class="fa-solid fa-id-card"></i></div>
+            <div class="kpi-info">
+              <div class="kpi-label">Registered Drivers</div>
+              <div class="kpi-value">5 Captains</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon purple"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div class="kpi-info">
+              <div class="kpi-label">Platform Gross Revenue</div>
+              <div class="kpi-value" id="adminRevenue">₹1,135</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon yellow"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="kpi-info">
+              <div class="kpi-label">System Availability (NFR-3)</div>
+              <div class="kpi-value text-green-400">99.5% Uptime</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle Controls & SPM Grid -->
+        <div class="admin-dual-grid">
+          
+          <!-- Surge Pricing & Operations Controller -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3><i class="fa-solid fa-sliders"></i> Dynamic Surge Pricing Engine (FR-5)</h3>
+              <span class="badge badge-accent">Operational Control</span>
+            </div>
+            <div class="surge-control-box">
+              <p class="text-muted">Adjust real-time peak demand surge multiplier across Ahmedabad / Gandhinagar cluster:</p>
+              <div class="slider-container">
+                <span class="slider-min">1.0x (Normal)</span>
+                <input type="range" min="1.0" max="2.5" step="0.1" value="1.2" id="adminSurgeSlider" class="form-range" />
+                <span class="slider-max">2.5x (Peak)</span>
+              </div>
+              <div class="surge-current-display">
+                Current Applied Surge: <strong id="adminSurgeDisplay">1.2x</strong>
+              </div>
+              <button id="btnUpdateSurge" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-check"></i> Save & Broadcast Surge Multiplier
+              </button>
+            </div>
+          </div>
+
+          <!-- SPM Tutorial 10 & 11 EVM & Quality Metrics Tracker -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3><i class="fa-solid fa-chart-pie"></i> SPM Earned Value & Quality Health</h3>
+              <span class="badge badge-info">Tutorial 10 & 11 Baseline</span>
+            </div>
+            <div class="spm-metrics-list">
+              <div class="spm-row">
+                <span>Earned Value Baseline:</span>
+                <strong>PV: ₹5.04L | EV: ₹4.89L | AC: ₹5.28L</strong>
+              </div>
+              <div class="spm-row">
+                <span>Performance Indices:</span>
+                <span><strong>SPI: 0.970</strong> (Schedule) | <strong>CPI: 0.926</strong> (Cost)</span>
+              </div>
+              <div class="spm-row">
+                <span>Defect Removal Efficiency (DRE):</span>
+                <strong class="text-yellow-400">92.3%</strong> (36 Fixed / 41 Total logged)
+              </div>
+              <div class="spm-row">
+                <span>Critical Defects Open:</span>
+                <strong class="text-green-400">0 Critical Defects (Audit Conformance)</strong>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Driver Verification & Fleet Management Table (FR-2, FR-13) -->
+        <div class="admin-card mt-6">
+          <div class="admin-card-header">
+            <h3><i class="fa-solid fa-users-gear"></i> Driver Fleet Management & Document Verification (FR-2)</h3>
+            <span class="badge badge-outline">5 Registered</span>
+          </div>
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Driver ID</th>
+                  <th>Captain Name</th>
+                  <th>Vehicle Details</th>
+                  <th>Documents</th>
+                  <th>Rating</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminDriverTableBody">
+                <!-- Dynamically populated from /api/drivers -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 4: SCM & GIT REPOSITORY EXPLORER (TUTORIAL 14) -->
+    <!-- ============================================== -->
+    <section id="scm-view" class="view-section">
+      <div class="scm-container">
+        
+        <!-- SCM Header -->
+        <div class="scm-header-banner">
+          <div>
+            <h2><i class="fa-brands fa-git-alt text-orange-500"></i> Software Configuration Management (SCM)</h2>
+            <p>Git/GitHub Repository Configuration, GitFlow Branching, Release Management & Baseline Traceability</p>
+          </div>
+          <div class="scm-authors">
+            <div>Authors: <strong>Jayni Khimasia (23BCE115) & Jiya Patel (23BCE123)</strong></div>
+            <div class="text-muted">SPM Tutorial 14 • Department of CSE, Nirma University</div>
+          </div>
+        </div>
+
+        <!-- SCM Cards Grid -->
+        <div class="scm-grid">
+          
+          <!-- Card 1: GitFlow Branching Model -->
+          <div class="scm-card">
+            <div class="scm-card-header">
+              <h3><i class="fa-solid fa-diagram-project"></i> GitFlow Branching Strategy</h3>
+              <span class="badge badge-git">Configured</span>
+            </div>
+            <p class="text-sm text-muted">Branch architecture isolating production releases from ongoing sprint increments:</p>
+            
+            <div class="branch-diagram">
+              <div class="branch-lane">
+                <span class="branch-badge main">main</span>
+                <span class="branch-line"></span>
+                <span class="commit-dot" title="Tag: v1.0.0">v1.0.0</span>
+                <span class="branch-line"></span>
+                <span class="commit-dot hotfix" title="Tag: v1.0.1">v1.0.1</span>
+              </div>
+              <div class="branch-lane">
+                <span class="branch-badge develop">develop</span>
+                <span class="branch-line"></span>
+                <span class="commit-dot" title="Sprint 1-4 Merge">dev</span>
+                <span class="branch-line"></span>
+                <span class="commit-dot" title="Release prep">v1.0.0-rc</span>
+              </div>
+              <div class="branch-lane">
+                <span class="branch-badge feature">features/*</span>
+                <span class="branch-line"></span>
+                <span class="commit-dot" title="feature/auth">auth</span>
+                <span class="commit-dot" title="feature/matching">match</span>
+                <span class="commit-dot" title="feature/fare">fare</span>
+              </div>
+            </div>
+
+            <ul class="branch-list">
+              <li><strong><code>main</code>:</strong> Production-ready releases only. Tagged with SemVer (<code>v1.0.0</code>, <code>v1.0.1</code>).</li>
+              <li><strong><code>develop</code>:</strong> Primary integration branch for sprint deliverables (M4).</li>
+              <li><strong><code>feature/*</code>:</strong> Isolated functional modules (Auth, Matching, Driver, Fare, Admin).</li>
+              <li><strong><code>release/v1.0.0</code>:</strong> Pre-release stabilization and smoke testing.</li>
+              <li><strong><code>hotfix/v1.0.1</code>:</strong> Emergency production fixes (Addresses MR-7 OTP timeout).</li>
+            </ul>
+          </div>
+
+          <!-- Card 2: Configuration Items & Baseline Matrix -->
+          <div class="scm-card">
+            <div class="scm-card-header">
+              <h3><i class="fa-solid fa-boxes-stacked"></i> Configuration Identification & Baselines</h3>
+              <span class="badge badge-accent">6 Baselines</span>
+            </div>
+            <p class="text-sm text-muted">Controlled Configuration Items (CIs) tracked across SPM Tutorials 1–14:</p>
+            
+            <table class="scm-table">
+              <thead>
+                <tr>
+                  <th>CI ID</th>
+                  <th>Configuration Item</th>
+                  <th>Baseline Milestone</th>
+                  <th>Version</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>CI-01</code></td>
+                  <td>Software Requirements Specification (SRS)</td>
+                  <td>Milestone M1 (Tut 1)</td>
+                  <td><code>v1.2</code></td>
+                </tr>
+                <tr>
+                  <td><code>CI-02</code></td>
+                  <td>Software Project Management Plan (SPMP)</td>
+                  <td>Milestone M2 (Tut 3)</td>
+                  <td><code>v1.1</code></td>
+                </tr>
+                <tr>
+                  <td><code>CI-03</code></td>
+                  <td>Work Breakdown Structure (WBS)</td>
+                  <td>Milestone M2 (Tut 4)</td>
+                  <td><code>v1.0</code></td>
+                </tr>
+                <tr>
+                  <td><code>CI-04</code></td>
+                  <td>System Architecture & DB Schema</td>
+                  <td>Milestone M3 (Tut 5)</td>
+                  <td><code>v1.1</code></td>
+                </tr>
+                <tr>
+                  <td><code>CI-05</code></td>
+                  <td>RideEase Application Codebase</td>
+                  <td>Milestone M4 & M7</td>
+                  <td><code>v1.0.1</code></td>
+                </tr>
+                <tr>
+                  <td><code>CI-06</code></td>
+                  <td>Test Suite & Verification Checklist</td>
+                  <td>Milestone M6 (Tut 12)</td>
+                  <td><code>v1.0</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <!-- Bottom Card: Git Commands & Traceability Matrix -->
+        <div class="scm-card mt-6">
+          <div class="scm-card-header">
+            <h3><i class="fa-solid fa-terminal"></i> Git CLI Repository History & Terminal Verification</h3>
+            <span class="badge badge-success">Verified Working</span>
+          </div>
+          <div class="terminal-box">
+            <pre><code>$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+nothing to commit, working tree clean
+
+$ git log --oneline --graph --all
+* 2f8b1a4 (HEAD -> main, tag: v1.0.1) Merge branch 'hotfix/v1.0.1-otp-timeout' into main
+|\  
+| * c7e42b1 (hotfix/v1.0.1-otp-timeout) Fix OTP timeout verification defect (MR-7)
+|/  
+* 89a31bc (tag: v1.0.0) Merge branch 'release/v1.0.0' into main (Milestone M7 Deployment)
+|\  
+| * a041e9f (release/v1.0.0) Bump version to 1.0.0 & finalize release documentation
+| * 55c91d2 Merge feature/admin-dashboard into develop (FR-13 Admin & SPM Monitoring)
+| * d3e198a Merge feature/fare-payment into develop (FR-5 Dynamic Surge & FR-8 Digital Receipt)
+| * b710c44 Merge feature/driver-module into develop (FR-7 Driver Navigation & Trip Lifecycle)
+| * f289012 Merge feature/ride-matching into develop (FR-3 Ride Request & FR-4 GPS Matching)
+| * 3b94a81 Merge feature/auth-module into develop (FR-1 Rider & FR-2 Driver Onboarding)
+|/  
+* 190c102 (develop) Initialize project structure and baseline configuration (CI-01 to CI-04)
+* 049a21b (tag: v0.1.0-baseline) Initial commit: SRS, SPMP, WBS, and SPM documentation baselines</code></pre>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================== -->
+    <!-- VIEW 5: SPLIT VIEW (SIMULTANEOUS RIDER & DRIVER) -->
+    <!-- ============================================== -->
+    <section id="split-view" class="view-section">
+      <div class="split-container">
+        <div class="split-pane">
+          <div class="split-pane-header">
+            <h3><i class="fa-solid fa-mobile-screen"></i> Rider Screen</h3>
+            <span class="badge badge-rider">Rider: Jayni</span>
+          </div>
+          <div class="split-inner" id="splitRiderMount">
+            <!-- Mirrored content via JS -->
+          </div>
+        </div>
+        <div class="split-pane">
+          <div class="split-pane-header">
+            <h3><i class="fa-solid fa-taxi"></i> Driver Screen</h3>
+            <span class="badge badge-driver">Captain: Rajesh</span>
+          </div>
+          <div class="split-inner" id="splitDriverMount">
+            <!-- Mirrored content via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- App JS -->
+  <script src="js/app.js"></script>
+</body>
+</html>
