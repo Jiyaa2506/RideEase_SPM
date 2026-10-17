@@ -368,6 +368,81 @@ body {
   margin-top: 0.5rem;
 }
 
+.hover-action {
+  cursor: pointer;
+}
+
+.portal-cta-box {
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.login-wrapper-single {
+  max-width: 480px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2.25rem 2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.btn-back-portal {
+  background: #f1f5f9;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-back-portal:hover {
+  color: var(--text-main);
+  background: #e2e8f0;
+}
+
+.login-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.login-card-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.divider-auth {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 0.85rem 0;
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.divider-auth::before,
+.divider-auth::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.divider-auth span {
+  padding: 0 10px;
+}
+
 .demo-mode-footer {
   background: #ffffff;
   border: 1px dashed #cbd5e1;

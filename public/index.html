@@ -79,112 +79,182 @@
     <!-- ============================================== -->
     <!-- VIEW 0: AUTHENTICATION & ROLE SELECTION GATEWAY -->
     <!-- ============================================== -->
+    <!-- ============================================== -->
+    <!-- VIEW 0: AUTHENTICATION & ROLE SELECTION GATEWAY -->
+    <!-- ============================================== -->
     <section id="auth-gateway-view" class="view-section active">
       <div class="auth-gateway-container">
         
-        <div class="auth-hero">
-          <div class="auth-hero-badge"><i class="fa-solid fa-shield-cat"></i> SPM Tutorial 14 Prototype</div>
-          <h1>Welcome to <span>RideEase</span></h1>
-          <p class="auth-hero-sub">
-            On-Demand Ride-Hailing Mobile Platform (Uber / Ola Reference Architecture).<br>
-            Please select your portal to continue with dedicated role-based dashboards:
-          </p>
+        <!-- STAGE 1: 3 PORTALS SELECTION SCREEN -->
+        <div id="portalSelectionScreen" class="portal-step active">
+          <div class="auth-hero">
+            <div class="auth-hero-badge"><i class="fa-solid fa-layer-group"></i> RideEase Multi-Portal Gateway</div>
+            <h1>Select Your <span>Portal</span></h1>
+            <p class="auth-hero-sub">
+              Click on any portal below to open its dedicated sign-in page and role-specific dashboard:
+            </p>
+          </div>
+
+          <div class="portal-cards-grid">
+            
+            <!-- PORTAL 1: RIDER -->
+            <div class="portal-card hover-action" onclick="openPortalLogin('rider')">
+              <div class="portal-card-header">
+                <div class="portal-icon rider-color"><i class="fa-solid fa-mobile-screen"></i></div>
+                <div class="portal-tag">PASSENGER</div>
+              </div>
+              <h3>1. Rider Portal</h3>
+              <p class="portal-desc">
+                Book doorstep rides, get real-time dynamic fare estimates, track live drivers on map, and make digital cashless payments.
+              </p>
+              <div class="portal-cta-box">
+                <button class="btn btn-primary btn-block">
+                  <span>Open Rider Login</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- PORTAL 2: DRIVER -->
+            <div class="portal-card hover-action" onclick="openPortalLogin('driver')">
+              <div class="portal-card-header">
+                <div class="portal-icon driver-color"><i class="fa-solid fa-taxi"></i></div>
+                <div class="portal-tag">PARTNER CAPTAIN</div>
+              </div>
+              <h3>2. Driver Portal</h3>
+              <p class="portal-desc">
+                Accept incoming ride dispatches, turn-by-turn navigation, verify passenger 4-digit PINs, and view today's earnings.
+              </p>
+              <div class="portal-cta-box">
+                <button class="btn btn-success btn-block">
+                  <span>Open Driver Login</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- PORTAL 3: ADMIN -->
+            <div class="portal-card hover-action" onclick="openPortalLogin('admin')">
+              <div class="portal-card-header">
+                <div class="portal-icon admin-color"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="portal-tag">OPERATIONS & SPM</div>
+              </div>
+              <h3>3. Admin Portal</h3>
+              <p class="portal-desc">
+                Approve driver documents, broadcast dynamic surge pricing, monitor SPM EVM & defect metrics, and inspect Git SCM.
+              </p>
+              <div class="portal-cta-box">
+                <button class="btn btn-primary btn-block" style="background:#7c3aed;">
+                  <span>Open Admin Login</span>
+                  <i class="fa-solid fa-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Demonstration Mode Shortcut -->
+          <div class="demo-mode-footer">
+            <span>🎓 Instructor Evaluation & Viva Presentation:</span>
+            <button class="btn btn-outline btn-sm" onclick="quickDemoLogin('split')">
+              <i class="fa-solid fa-columns"></i> Launch Split View (Rider & Driver Side-by-Side)
+            </button>
+          </div>
         </div>
 
-        <div class="portal-cards-grid">
-          
-          <!-- PORTAL 1: RIDER APP -->
-          <div class="portal-card">
-            <div class="portal-card-header">
-              <div class="portal-icon rider-color"><i class="fa-solid fa-mobile-screen"></i></div>
-              <div class="portal-tag">PASSENGER APP</div>
-            </div>
-            <h3>Rider Portal</h3>
-            <p class="portal-desc">
-              Book doorstep rides, get fare estimates with dynamic surge, track live drivers, and pay cashlessly.
-            </p>
-            <div class="portal-form">
-              <div class="form-group-auth">
-                <label>Mobile Number or Email</label>
-                <input type="text" id="riderLoginInput" class="form-input" value="+91 98980-12345" />
+        <!-- STAGE 2: DEDICATED LOGIN PAGES (Opened when clicking a portal) -->
+        <div id="dedicatedLoginScreen" class="portal-step" style="display:none;">
+          <div class="login-wrapper-single">
+            
+            <button class="btn-back-portal" onclick="backToPortalSelection()">
+              <i class="fa-solid fa-arrow-left"></i> Back to 3 Portals Selection
+            </button>
+
+            <!-- DEDICATED LOGIN FORM: RIDER -->
+            <div id="loginFormRider" class="login-role-form" style="display:none;">
+              <div class="login-card-header">
+                <div class="portal-icon rider-color"><i class="fa-solid fa-mobile-screen"></i></div>
+                <div>
+                  <h2>Rider Portal Login</h2>
+                  <p class="text-muted text-sm">Sign in with your mobile number or university email</p>
+                </div>
               </div>
-              <div class="form-group-auth">
-                <label>Account Password / OTP</label>
-                <input type="password" id="riderOtpInput" class="form-input" value="1234" />
+              <div class="portal-form">
+                <div class="form-group-auth">
+                  <label>Mobile Number or Email</label>
+                  <input type="text" id="riderLoginInput" class="form-input" value="+91 98980-12345" />
+                </div>
+                <div class="form-group-auth">
+                  <label>Password / 4-Digit PIN</label>
+                  <input type="password" id="riderOtpInput" class="form-input" value="1234" />
+                </div>
+                <button class="btn btn-primary btn-block" onclick="handleRoleLogin('rider')">
+                  <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Rider App
+                </button>
+                <div class="divider-auth"><span>OR</span></div>
+                <button class="btn btn-outline btn-block" onclick="quickDemoLogin('rider')">
+                  ⚡ 1-Click Demo Login: Jayni Khimasia (23BCE115)
+                </button>
               </div>
-              <button class="btn btn-primary btn-block" onclick="handleRoleLogin('rider')">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Rider App
-              </button>
-              <button class="btn btn-outline btn-block btn-sm mt-2" onclick="quickDemoLogin('rider')">
-                ⚡ Quick Demo: Jayni Khimasia (23BCE115)
-              </button>
             </div>
+
+            <!-- DEDICATED LOGIN FORM: DRIVER -->
+            <div id="loginFormDriver" class="login-role-form" style="display:none;">
+              <div class="login-card-header">
+                <div class="portal-icon driver-color"><i class="fa-solid fa-taxi"></i></div>
+                <div>
+                  <h2>Driver Captain Login</h2>
+                  <p class="text-muted text-sm">Enter your Driver ID and vehicle registration number</p>
+                </div>
+              </div>
+              <div class="portal-form">
+                <div class="form-group-auth">
+                  <label>Driver ID or Phone</label>
+                  <input type="text" id="driverLoginInput" class="form-input" value="DRV-101" />
+                </div>
+                <div class="form-group-auth">
+                  <label>Vehicle Plate Registration</label>
+                  <input type="text" id="driverPlateInput" class="form-input" value="GJ-01-AB-4829" />
+                </div>
+                <button class="btn btn-success btn-block" onclick="handleRoleLogin('driver')">
+                  <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Driver Companion
+                </button>
+                <div class="divider-auth"><span>OR</span></div>
+                <button class="btn btn-outline btn-block" onclick="quickDemoLogin('driver')">
+                  ⚡ 1-Click Demo Login: Captain Rajesh Kumar
+                </button>
+              </div>
+            </div>
+
+            <!-- DEDICATED LOGIN FORM: ADMIN -->
+            <div id="loginFormAdmin" class="login-role-form" style="display:none;">
+              <div class="login-card-header">
+                <div class="portal-icon admin-color"><i class="fa-solid fa-chart-line"></i></div>
+                <div>
+                  <h2>Admin & SPM Portal Login</h2>
+                  <p class="text-muted text-sm">Authorized system administrators & course evaluators</p>
+                </div>
+              </div>
+              <div class="portal-form">
+                <div class="form-group-auth">
+                  <label>Administrator Email</label>
+                  <input type="text" id="adminLoginInput" class="form-input" value="admin@rideease.nirmauni.ac.in" />
+                </div>
+                <div class="form-group-auth">
+                  <label>Security Password</label>
+                  <input type="password" id="adminPasswordInput" class="form-input" value="admin123" />
+                </div>
+                <button class="btn btn-primary btn-block" style="background:#7c3aed;" onclick="handleRoleLogin('admin')">
+                  <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In to Admin Console
+                </button>
+                <div class="divider-auth"><span>OR</span></div>
+                <button class="btn btn-outline btn-block" onclick="quickDemoLogin('admin')">
+                  ⚡ 1-Click Demo Login: System Admin (Jiya Patel)
+                </button>
+              </div>
+            </div>
+
           </div>
-
-          <!-- PORTAL 2: DRIVER COMPANION -->
-          <div class="portal-card">
-            <div class="portal-card-header">
-              <div class="portal-icon driver-color"><i class="fa-solid fa-taxi"></i></div>
-              <div class="portal-tag">PARTNER CAPTAIN</div>
-            </div>
-            <h3>Driver Portal</h3>
-            <p class="portal-desc">
-              Accept incoming ride dispatches, follow turn-by-turn navigation, verify passenger PINs, and track earnings.
-            </p>
-            <div class="portal-form">
-              <div class="form-group-auth">
-                <label>Driver ID or Phone</label>
-                <input type="text" id="driverLoginInput" class="form-input" value="DRV-101" />
-              </div>
-              <div class="form-group-auth">
-                <label>Vehicle Plate Registration</label>
-                <input type="text" id="driverPlateInput" class="form-input" value="GJ-01-AB-4829" />
-              </div>
-              <button class="btn btn-success btn-block" onclick="handleRoleLogin('driver')">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Driver Companion
-              </button>
-              <button class="btn btn-outline btn-block btn-sm mt-2" onclick="quickDemoLogin('driver')">
-                ⚡ Quick Demo: Captain Rajesh Kumar
-              </button>
-            </div>
-          </div>
-
-          <!-- PORTAL 3: ADMIN OPERATIONS & SPM -->
-          <div class="portal-card">
-            <div class="portal-card-header">
-              <div class="portal-icon admin-color"><i class="fa-solid fa-chart-line"></i></div>
-              <div class="portal-tag">SYSTEM OPERATOR</div>
-            </div>
-            <h3>Admin Portal</h3>
-            <p class="portal-desc">
-              Manage driver documents, broadcast dynamic surge pricing, monitor SPM EVM metrics, and explore Git SCM.
-            </p>
-            <div class="portal-form">
-              <div class="form-group-auth">
-                <label>Administrator Email</label>
-                <input type="text" id="adminLoginInput" class="form-input" value="admin@rideease.nirmauni.ac.in" />
-              </div>
-              <div class="form-group-auth">
-                <label>Security Password</label>
-                <input type="password" id="adminPasswordInput" class="form-input" value="admin123" />
-              </div>
-              <button class="btn btn-primary btn-block" onclick="handleRoleLogin('admin')">
-                <i class="fa-solid fa-arrow-right-to-bracket"></i> Login to Admin Console
-              </button>
-              <button class="btn btn-outline btn-block btn-sm mt-2" onclick="quickDemoLogin('admin')">
-                ⚡ Quick Demo: System Admin (Jiya Patel)
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Demonstration Mode Shortcut -->
-        <div class="demo-mode-footer">
-          <span>🎓 Instructor Evaluation & Viva Presentation:</span>
-          <button class="btn btn-outline btn-sm" onclick="quickDemoLogin('split')">
-            <i class="fa-solid fa-columns"></i> Open Dual Split-Screen Simulation (Rider & Driver Side-by-Side)
-          </button>
         </div>
 
       </div>

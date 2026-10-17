@@ -75,6 +75,7 @@ function initAuthSession() {
   const brandBtn = document.getElementById('brandHomeBtn');
   if (brandBtn) {
     brandBtn.addEventListener('click', () => {
+      backToPortalSelection();
       switchView('auth-gateway-view');
     });
   }
@@ -82,6 +83,7 @@ function initAuthSession() {
   const loginBtn = document.getElementById('navLoginBtn');
   if (loginBtn) {
     loginBtn.addEventListener('click', () => {
+      backToPortalSelection();
       switchView('auth-gateway-view');
     });
   }
@@ -172,12 +174,42 @@ window.quickDemoLogin = function(role) {
   showToast(`Logged into ${role.toUpperCase()} portal!`, 'success');
 };
 
+window.openPortalLogin = function(role) {
+  const selectionScreen = document.getElementById('portalSelectionScreen');
+  const loginScreen = document.getElementById('dedicatedLoginScreen');
+
+  if (selectionScreen) selectionScreen.style.display = 'none';
+  if (loginScreen) loginScreen.style.display = 'block';
+
+  // Hide all login forms first
+  document.getElementById('loginFormRider').style.display = 'none';
+  document.getElementById('loginFormDriver').style.display = 'none';
+  document.getElementById('loginFormAdmin').style.display = 'none';
+
+  if (role === 'rider') {
+    document.getElementById('loginFormRider').style.display = 'block';
+  } else if (role === 'driver') {
+    document.getElementById('loginFormDriver').style.display = 'block';
+  } else if (role === 'admin') {
+    document.getElementById('loginFormAdmin').style.display = 'block';
+  }
+};
+
+window.backToPortalSelection = function() {
+  const selectionScreen = document.getElementById('portalSelectionScreen');
+  const loginScreen = document.getElementById('dedicatedLoginScreen');
+
+  if (selectionScreen) selectionScreen.style.display = 'block';
+  if (loginScreen) loginScreen.style.display = 'none';
+};
+
 window.logout = function() {
   state.currentUser = null;
   localStorage.removeItem('rideease_user');
   document.getElementById('mainNavTabs').style.display = 'none';
   document.getElementById('navUserProfile').style.display = 'none';
   document.getElementById('navLoginBtn').style.display = 'inline-flex';
+  backToPortalSelection();
   switchView('auth-gateway-view');
   showToast('Signed out of RideEase portal', 'info');
 };
