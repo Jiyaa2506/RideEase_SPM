@@ -146,12 +146,25 @@ function initMap() {
     zoomControl: true
   });
 
-  // Modern clean dark tile layer
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-    subdomains: 'abcd',
+  // 100% Free Tile Servers (No API keys or credit cards required)
+  const osmStandard = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19
-  }).addTo(state.activeMap);
+  });
+
+  const esriStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
+    maxZoom: 19
+  });
+
+  // Default to OSM
+  osmStandard.addTo(state.activeMap);
+
+  // Add Layer Control for easy map style toggling
+  L.control.layers({
+    "OpenStreetMap (Standard)": osmStandard,
+    "Navigation Street View (Esri)": esriStreet
+  }, null, { position: 'topleft' }).addTo(state.activeMap);
 
   // Render static fleet cars
   renderFleetMarkers();
